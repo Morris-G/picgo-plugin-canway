@@ -1,9 +1,9 @@
 module.exports = ctx => {
-  const UPLOAD_URL = 'http://172.16.12.95:25902/api/user/images/'
+  const UPLOAD_URL = 'http://image.canwaytest.net/web/api/user/spaces/{userId}/images'
   const register = () => {
     ctx.helper.uploader.register('canway', {
       handle,
-      name: '嘉为蓝鲸图床',
+      name: '嘉为图床',
       config: config
     })
   }
@@ -29,12 +29,13 @@ module.exports = ctx => {
         let body = await ctx.Request.request(postConfig)
         delete img.base64Image
         delete img.buffer
+        ctx.log.info(body)
         body = JSON.parse(body)
-        const { code, message, data } = body
+        const { code, data } = body
         if (code === 0) {
-          img['imgUrl'] = data.url
+          img['imgUrl'] = data.originalUrl
         } else {
-          throw new Error(message)
+          throw new Error(body)
         }
       }
       return ctx
@@ -43,7 +44,7 @@ module.exports = ctx => {
         title: '上传失败',
         body: err.message
       }
-      ctx.log.error(JSON.stringify(content))
+      ctx.log.error(err)
       ctx.emit('notification', content)
     }
   }
@@ -52,10 +53,7 @@ module.exports = ctx => {
     let headers = {
       contentType: 'multipart/form-data',
       'User-Agent': 'PicGo',
-      'X_DEVOPS_USER_TOKEN':
-        'qbZeCYAYhr9S9hMlSP0M3KOKODq131oh_NOrG4Kdi0rFtBtEeHxcGOKlF2BoSuGTtnqLv4yyXyT9Z5ai_jdgqEpQf7ODcnwPpYVyU_sHhxBGMWi_PS4V1LABkq0q4GNqJrkuTCLas4rmjafTETM7ivv5UozG-wJsWQqPwKiGSaidAHiT_AkH2RMVxwN6V_F92xI3cIIRsp91FEf-uwqqF0ECAGw75PrdhmS-7HAT16EGb3REj7WkTSFfDS-kYv9oT1M8VJ2HxWdf16duwPUdQ_BKDBL8SkWc27CNaUCcuV30h6GrdRulqiu-0bV0oL5YfuJlSWu21Coui7m77sBdajJuGuOZD5VmEalvDG5dExx14lp-rGMmJGdHSFIgH6h4pzvsdsQhUaouw0LqR_8fBUsfxRgZznTMFZmAUp82Ld3xucTBQgEjMSx13uaHNNtSt6uxX2n4qOe1HexHs_rFFEX4bD_mUXVcHK2nrq1xBYM',
-      'X-DEVOPS-UID': 'Adam'
-    //   Authorization: token
+      Authorization: token
     }
 
     let formData = {
@@ -69,7 +67,7 @@ module.exports = ctx => {
     }
     const opts = {
       method: 'POST',
-      url: UPLOAD_URL + userId,
+      url: UPLOAD_URL.replace('{userId}', userId),
       headers: headers,
       formData
     }
@@ -102,7 +100,7 @@ module.exports = ctx => {
       {
         name: 'autoRename',
         type: 'confirm',
-        default: userConfig.autoRename,
+        default: userConfig.autoRename || true,
         required: true,
         message: '存在重名图片时，是否自动重命名',
         alias: '自动重命名'
