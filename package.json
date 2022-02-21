@@ -1,6 +1,6 @@
 {
   "name": "picgo-plugin-canway",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "嘉为图床插件",
   "main": "src/index.js",
   "publishConfig": {

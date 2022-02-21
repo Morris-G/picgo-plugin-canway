@@ -1,4 +1,4 @@
-# picgo-plugin-web-uploader
+# picgo-plugin-canway
 
 plugin for [PicGo](https://github.com/Molunerfinn/PicGo)
 
