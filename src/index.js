@@ -15,8 +15,8 @@ module.exports = ctx => {
     }
     const token = userConfig.token
     const params = {
-      autoRename: userConfig.autoRename + '',
-      isCover: userConfig.isCover + ''
+      autoRename: (userConfig.duplicate.value === 0) + '',
+      isCover: (userConfig.duplicate.value === 1) + ''
     }
     try {
       const imgList = ctx.output
@@ -35,7 +35,7 @@ module.exports = ctx => {
         if (code === 0) {
           img['imgUrl'] = data.originalUrl
         } else {
-          throw new Error(body)
+          throw new Error(body.message)
         }
       }
       return ctx
@@ -98,20 +98,16 @@ module.exports = ctx => {
         alias: '个人秘钥'
       },
       {
-        name: 'autoRename',
-        type: 'confirm',
-        default: userConfig.autoRename || true,
+        name: 'duplicate',
+        type: 'list',
+        default: userConfig.duplicate,
         required: true,
-        message: '存在重名图片时，是否自动重命名',
-        alias: '自动重命名'
-      },
-      {
-        name: 'isCover',
-        type: 'confirm',
-        default: userConfig.isCover,
-        required: true,
-        message: '存在重名图片时，是否覆盖同名文件',
-        alias: '覆盖同名文件'
+        message: '存在重名图片时，将使用此方式处理',
+        alias: '重名处理',
+        choices: [
+          { name: '自动重命名', value: 0 },
+          { name: '覆盖同名文件', value: 1 }
+        ]
       }
     ]
   }
